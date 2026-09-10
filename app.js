@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize all interactive modules
   initCosmicCanvas();
   initCursorGlow();
+  initRocketCompanion();
   initTypewriter();
   initCounters();
   initBB84Simulator();
@@ -160,6 +161,179 @@ function initCursorGlow() {
     requestAnimationFrame(render);
   }
   render();
+}
+
+/* ==========================================================================
+   2.1 INTERACTIVE MINI ROCKET COMPANION & CIRCLING ORBIT
+   ========================================================================== */
+function initRocketCompanion() {
+  const rocket = document.getElementById('rocket-companion');
+  const trailCanvas = document.getElementById('rocket-trail-canvas');
+  if (!rocket || !trailCanvas) return;
+
+  const ctx = trailCanvas.getContext('2d');
+  let width = (trailCanvas.width = window.innerWidth);
+  let height = (trailCanvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    width = trailCanvas.width = window.innerWidth;
+    height = trailCanvas.height = window.innerHeight;
+  });
+
+  // Rocket position and motion variables
+  let x = width / 2;
+  let y = height / 2;
+  let prevX = x;
+  let prevY = y;
+  let targetX = x;
+  let targetY = y;
+  let currentAngle = 0; // Radians, 0 is up
+
+  let isIdle = false;
+  let lastMouseMoveTime = Date.now();
+  const IDLE_THRESHOLD = 1400; // 1.4s without cursor movement triggers circling
+  let orbitAngle = 0;
+
+  // Stardust & ion exhaust particles
+  const particles = [];
+
+  // Track mouse coordinates
+  window.addEventListener('mousemove', (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+    lastMouseMoveTime = Date.now();
+    if (isIdle) {
+      isIdle = false;
+    }
+  });
+
+  // Trigger circling early when mouse exits viewport
+  window.addEventListener('mouseleave', () => {
+    lastMouseMoveTime = 0;
+  });
+
+  // Interactive rocket booster burst on user click
+  window.addEventListener('mousedown', () => {
+    for (let i = 0; i < 16; i++) {
+      particles.push(createParticle(x, y, true));
+    }
+  });
+
+  function createParticle(originX, originY, isBoost = false) {
+    // Particles shoot backwards relative to rocket heading
+    const angle = currentAngle + Math.PI / 2 + (Math.random() - 0.5) * (isBoost ? 1.6 : 0.7);
+    const speed = (Math.random() * 2.6 + 1.2) * (isBoost ? 2.4 : 1.0);
+    const palette = ['#00f5d4', '#6366f1', '#8b5cf6', '#ffb703', '#38bdf8'];
+    const color = palette[Math.floor(Math.random() * palette.length)];
+
+    return {
+      x: originX,
+      y: originY,
+      vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 0.7,
+      vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * (isBoost ? 3.6 : 2.2) + 0.9,
+      alpha: 1.0,
+      decay: Math.random() * 0.026 + 0.016,
+      color: color
+    };
+  }
+
+  function loop() {
+    const now = Date.now();
+    const idleDuration = now - lastMouseMoveTime;
+
+    if (idleDuration > IDLE_THRESHOLD) {
+      isIdle = true;
+      // CIRCLING MODE:
+      // The rocket embarks on an expansive orbital lap circling around the website viewport
+      const cx = width / 2;
+      const cy = height / 2;
+      // Orbital radius spanning across the viewport
+      const rx = Math.max(Math.min(width * 0.44, width / 2 - 40), 180);
+      const ry = Math.max(Math.min(height * 0.40, height / 2 - 40), 140);
+
+      orbitAngle += 0.018; // Smooth cruising orbit speed
+      // Elliptical orbit with gentle 3D wave oscillation
+      targetX = cx + Math.cos(orbitAngle) * rx;
+      targetY = cy + Math.sin(orbitAngle) * ry + Math.sin(orbitAngle * 2.2) * 45;
+    }
+
+    // Rocket physics towards target
+    const dx = targetX - x;
+    const dy = targetY - y;
+    const dist = Math.hypot(dx, dy);
+
+    // Dynamic smoothing: accelerates when far, glides gracefully when close
+    const lerpRate = isIdle ? 0.055 : (dist > 320 ? 0.11 : (dist > 100 ? 0.08 : 0.062));
+    x += dx * lerpRate;
+    y += dy * lerpRate;
+
+    // Movement delta to determine heading direction
+    const moveDx = x - prevX;
+    const moveDy = y - prevY;
+    const moveSpeed = Math.hypot(moveDx, moveDy);
+
+    if (moveSpeed > 0.4) {
+      // Calculate target angle (atan2 + PI/2 aligns nose pointing in direction of velocity)
+      const targetAngle = Math.atan2(moveDy, moveDx) + Math.PI / 2;
+      let diff = targetAngle - currentAngle;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      currentAngle += diff * 0.16;
+    } else if (!isIdle) {
+      // Gentle atmospheric hover oscillation when stationary
+      currentAngle += Math.sin(now * 0.003) * 0.015;
+    }
+
+    // Render rocket position & rotation
+    const deg = (currentAngle * 180) / Math.PI;
+    rocket.style.transform = `translate3d(${x - 22}px, ${y - 22}px, 0) rotate(${deg}deg)`;
+
+    // Emit exhaust particles from rocket nozzle
+    if (moveSpeed > 0.4 || isIdle) {
+      // Nozzle is 18px behind the center along heading
+      const nozzleX = x - Math.sin(currentAngle) * -18;
+      const nozzleY = y + Math.cos(currentAngle) * -18;
+
+      const spawnCount = isIdle ? 1 : (moveSpeed > 3.5 ? 3 : 2);
+      for (let i = 0; i < spawnCount; i++) {
+        particles.push(createParticle(nozzleX, nozzleY));
+      }
+    }
+
+    prevX = x;
+    prevY = y;
+
+    // Draw and update particle trail on canvas
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= p.decay;
+      p.radius *= 0.965;
+
+      if (p.alpha <= 0 || p.radius <= 0.25) {
+        particles.splice(i, 1);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.alpha, 0);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(p.radius, 0.4), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
 }
 
 /* ==========================================================================
@@ -659,7 +833,7 @@ function initContactForm() {
     const message = document.getElementById('sender-message')?.value || '';
 
     const mailtoBody = `Name: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
-    const mailtoLink = `mailto:muthusankarak@gmail.com?subject=${encodeURIComponent(subject)}&body=${mailtoBody}`;
+    const mailtoLink = `mailto:muthusankar77777@gmail.com?subject=${encodeURIComponent(subject)}&body=${mailtoBody}`;
 
     window.location.href = mailtoLink;
   });
