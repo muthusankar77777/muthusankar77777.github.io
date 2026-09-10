@@ -55,5 +55,5 @@ The website is designed with an immersive **Quantum & Deep-Space Cyber** aesthet
 
 - **Phone / WhatsApp**: [+91 76048 36036](tel:+917604836036)
 - **GitHub**: [@muthusankar77777](https://github.com/muthusankar77777)
-- **Email**: [muthusankarak@gmail.com](mailto:muthusankarak@gmail.com)
+- **Email**: [muthusankar77777@gmail.com](mailto:muthusankar77777@gmail.com)
 - **Campus**: College of Engineering, Guindy (Anna University), Chennai, Tamil Nadu, India
