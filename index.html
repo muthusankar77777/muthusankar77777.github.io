@@ -88,6 +88,47 @@
   <!-- Interactive Custom Cursor Glow Tracker (Desktop) -->
   <div id="cursor-glow" class="fixed w-96 h-96 rounded-full bg-quantum-cyan/5 blur-[90px] pointer-events-none z-10 transition-transform duration-75 hidden md:block"></div>
 
+  <!-- Rocket Exhaust & Starlight Trail Canvas -->
+  <canvas id="rocket-trail-canvas" class="fixed inset-0 pointer-events-none z-40 hidden md:block"></canvas>
+
+  <!-- Interactive Mini Aerospace Rocket Companion -->
+  <div id="rocket-companion" class="fixed pointer-events-none z-50 hidden md:block" style="top: 0; left: 0; transform: translate3d(-100px, -100px, 0); will-change: transform;">
+    <div id="rocket-inner" class="relative w-11 h-11 flex items-center justify-center filter drop-shadow-[0_0_12px_rgba(0,245,212,0.65)]">
+      <svg id="rocket-svg" class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Thruster Flame / Exhaust Glow -->
+        <g id="rocket-flame" class="origin-bottom">
+          <path d="M32 50 C28 55, 27 61, 32 64 C37 61, 36 55, 32 50 Z" fill="#ff4d4d" opacity="0.9" />
+          <path d="M32 51 C29.5 55, 29 59, 32 62 C35 59, 34.5 55, 32 51 Z" fill="#ffb703" />
+          <path d="M32 51 C30.5 53, 30.5 56, 32 58 C33.5 56, 33.5 53, 32 51 Z" fill="#00f5d4" />
+        </g>
+        <!-- Engine Nozzle -->
+        <path d="M28 47 L36 47 L35 51 L29 51 Z" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+        <!-- Left Wing Fin -->
+        <path d="M22 36 L12 47 C10 49, 13 50, 18 48 L22 43 Z" fill="#6366f1" stroke="#818cf8" stroke-width="1.2"/>
+        <!-- Right Wing Fin -->
+        <path d="M42 36 L52 47 C54 49, 51 50, 46 48 L42 43 Z" fill="#6366f1" stroke="#818cf8" stroke-width="1.2"/>
+        <!-- Main Rocket Fuselage -->
+        <path d="M32 4 C23 18, 21 34, 22 47 L42 47 C43 34, 41 18, 32 4 Z" fill="url(#rocket-body-grad)" stroke="#00f5d4" stroke-width="1.5"/>
+        <!-- Center Spine / Aerodynamic Ridge -->
+        <path d="M32 10 L32 47" stroke="#00f5d4" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+        <!-- Cockpit Glass Visor -->
+        <ellipse cx="32" cy="22" rx="4" ry="5.5" fill="#030712" stroke="#00f5d4" stroke-width="1.4"/>
+        <ellipse cx="32" cy="21" rx="2.5" ry="3.5" fill="#00f5d4" opacity="0.85"/>
+        <circle cx="31" cy="20" r="1" fill="#ffffff"/>
+        <!-- Accent LED Indicators -->
+        <circle cx="27" cy="38" r="1" fill="#00f5d4"/>
+        <circle cx="37" cy="38" r="1" fill="#00f5d4"/>
+        <defs>
+          <linearGradient id="rocket-body-grad" x1="21" y1="4" x2="43" y2="47" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="45%" stop-color="#1e293b"/>
+            <stop offset="100%" stop-color="#0b112c"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
   <!-- Header / Navigation Bar -->
   <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-space-950/70 border-b border-slate-800/60" id="main-header">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -1209,10 +1250,10 @@
               </div>
               <div>
                 <div class="text-xs text-slate-400 font-mono">Email Inquiry</div>
-                <div class="text-base font-semibold text-white font-mono mt-0.5">muthusankarak@gmail.com</div>
+                <div class="text-base font-semibold text-white font-mono mt-0.5">muthusankar77777@gmail.com</div>
               </div>
             </div>
-            <button class="copy-btn p-2.5 rounded-lg bg-space-900 border border-slate-700 text-slate-300 hover:text-quantum-indigo hover:border-quantum-indigo transition-all" data-copy="muthusankarak@gmail.com" title="Copy Email Address">
+            <button class="copy-btn p-2.5 rounded-lg bg-space-900 border border-slate-700 text-slate-300 hover:text-quantum-indigo hover:border-quantum-indigo transition-all" data-copy="muthusankar77777@gmail.com" title="Copy Email Address">
               <i data-lucide="copy" class="w-4 h-4"></i>
             </button>
           </div>
