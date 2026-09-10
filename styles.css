@@ -162,3 +162,46 @@ input:focus, textarea:focus {
     padding: 1.25rem;
   }
 }
+
+/* ==========================================================================
+   MINI ROCKET COMPANION & THRUSTER TRAIL
+   ========================================================================== */
+#rocket-companion {
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+#rocket-inner {
+  transform-origin: center center;
+}
+
+@keyframes thrusterFlicker {
+  0%, 100% {
+    transform: scaleY(0.9) scaleX(0.95);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 6px rgba(0, 245, 212, 0.7));
+  }
+  50% {
+    transform: scaleY(1.35) scaleX(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px #ffb703) drop-shadow(0 0 18px #00f5d4);
+  }
+}
+
+#rocket-flame {
+  animation: thrusterFlicker 0.15s ease-in-out infinite alternate;
+  transform-origin: 32px 47px;
+}
+
+#rocket-trail-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 40;
+  pointer-events: none;
+}
+
